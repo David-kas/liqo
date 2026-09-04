@@ -1,8 +1,9 @@
 {
-  "name": "alko-dostavka-static",
+  "name": "liqo-static",
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "node scripts/vercel-prepare.mjs",
     "generate:seo": "node scripts/generate-seo-pages.mjs",
     "fix:seo": "node scripts/fix-site-seo.mjs",
     "patch:cart": "node scripts/patch-header-cart.mjs",
@@ -21,9 +22,8 @@
     "catalog:render": "node scripts/render-catalog-html.mjs",
     "seed:blob": "node scripts/seed-blob-catalog.mjs",
     "perf": "npm run build:assets && npm run patch:perf",
-    "build:zomro": "node scripts/build-zomro.mjs",
     "migrate:liqo": "node scripts/migrate-liqo.mjs",
-    "liqo:all": "node scripts/migrate-liqo.mjs && node scripts/build-assets.mjs && node scripts/build-zomro.mjs"
+    "liqo:all": "node scripts/migrate-liqo.mjs && node scripts/build-assets.mjs"
   },
   "devDependencies": {
     "clean-css": "^5.3.3",
