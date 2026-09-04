@@ -46,7 +46,6 @@ function repairHomepageSchema(html) {
   const org = html.indexOf('"@type": "Organization"', start);
   if (org === -1) return html;
   const between = html.slice(start, org);
-  // Repair only the known missing LocalBusiness closing brace. Idempotent on repeat builds.
   if (/}\s*,\s*{\s*$/.test(between)) {
     const fixedBetween = between.replace(/}\s*,\s*{\s*$/, '}\n            },\n            {\n            ');
     return html.slice(0, start) + fixedBetween + html.slice(org);
@@ -75,7 +74,8 @@ function routeFromHtml(file) {
   if (rel === 'index.html') return '/';
   if (!rel.endsWith('.html')) return null;
   if (rel === '404.html' || rel.startsWith('admin/')) return null;
-  return '/' + rel.slice(0, -5);
+  if (rel.endsWith('/index.html')) return '/' + rel.slice(0, -'index.html'.length);
+  return '/' + rel;
 }
 
 function generateSitemap() {
@@ -87,8 +87,8 @@ function generateSitemap() {
     .sort((a, b) => a.localeCompare(b));
 
   const urls = pages.map((route) => {
-    const priority = route === '/' ? '1.0' : route === '/catalog' ? '0.9' : '0.7';
-    const changefreq = route === '/' || route === '/catalog' ? 'weekly' : 'monthly';
+    const priority = route === '/' ? '1.0' : route === '/catalog.html' ? '0.9' : '0.7';
+    const changefreq = route === '/' || route === '/catalog.html' ? 'weekly' : 'monthly';
     return `  <url>\n    <loc>${NEW_ORIGIN}${route}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
   }).join('\n');
 
@@ -114,7 +114,6 @@ for (const file of walk(ROOT)) {
   }
 }
 
-// Build a fresh sitemap from the actual public HTML pages, so it cannot retain stale domains.
 fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), generateSitemap(), 'utf8');
 fs.writeFileSync(
   path.join(ROOT, 'robots.txt'),
