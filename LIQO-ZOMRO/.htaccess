@@ -1,0 +1,74 @@
+# LIQO — Apache / Zomro
+RewriteEngine On
+
+# HTTPS + canonical host liqo.pro (без www)
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\.liqo\.pro$ [NC]
+RewriteRule ^ https://liqo.pro%{REQUEST_URI} [R=301,L]
+
+# Старый Vercel-домен → liqo.pro (если запрос попал на хостинг по старому DNS)
+RewriteCond %{HTTP_HOST} alkodostavka24\.vercel\.app$ [NC,OR]
+RewriteCond %{HTTP_HOST} dostavka-alkogolya-24\.vercel\.app$ [NC,OR]
+RewriteCond %{HTTP_HOST} alkodostavka24\.online$ [NC]
+RewriteRule ^ https://liqo.pro%{REQUEST_URI} [R=301,L]
+
+# Корпоратив (из vercel.json)
+Redirect 301 /korporativ.html https://liqo.pro/povod/korporativ/
+
+# Legacy-категории (не в sitemap) → актуальные SEO URL
+Redirect 301 /vodka.html https://liqo.pro/kategoria/vodka/
+Redirect 301 /vodka/ https://liqo.pro/kategoria/vodka/
+Redirect 301 /viski.html https://liqo.pro/kategoria/viski/
+Redirect 301 /viski/ https://liqo.pro/kategoria/viski/
+Redirect 301 /vino.html https://liqo.pro/kategoria/vino/
+Redirect 301 /vino/ https://liqo.pro/kategoria/vino/
+Redirect 301 /vermut.html https://liqo.pro/catalog.html
+Redirect 301 /vermut/ https://liqo.pro/catalog.html
+Redirect 301 /tekila.html https://liqo.pro/catalog.html
+Redirect 301 /tekila/ https://liqo.pro/catalog.html
+Redirect 301 /rom.html https://liqo.pro/catalog.html
+Redirect 301 /rom/ https://liqo.pro/catalog.html
+Redirect 301 /shampanskoe.html https://liqo.pro/kategoria/igristoe/
+Redirect 301 /shampanskoe/ https://liqo.pro/kategoria/igristoe/
+Redirect 301 /sigarety.html https://liqo.pro/catalog.html
+Redirect 301 /sigarety/ https://liqo.pro/catalog.html
+
+# API: Vercel-style path → PHP
+RewriteRule ^api/telegram$ api/order.php [L,QSA]
+RewriteRule ^api/send-telegram$ api/order.php [L,QSA]
+
+# Каталог без .html
+RewriteRule ^catalog/?$ /catalog.html [L]
+
+# Директории со index.html
+DirectoryIndex index.html
+
+# Кэш статики
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
+
+# Защита конфигурации
+<FilesMatch "^(telegram\.json|\.env)$">
+  Require all denied
+</FilesMatch>
+
+# Безопасность
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Admin — noindex
+<IfModule mod_headers.c>
+  <FilesMatch "^admin">
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+  </FilesMatch>
+</IfModule>

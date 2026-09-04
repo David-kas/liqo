@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://liqo.pro/sitemap.xml
+Host: https://liqo.pro

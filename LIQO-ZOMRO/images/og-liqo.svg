@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <rect x="80" y="80" width="1040" height="470" rx="4" fill="none" stroke="#1f1f1f" stroke-width="1"/>
+  <text x="600" y="290" text-anchor="middle" fill="#f5f0e8" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="300" letter-spacing="18">LIQO</text>
+  <line x1="420" y1="330" x2="780" y2="330" stroke="#c9a962" stroke-width="1"/>
+  <text x="600" y="390" text-anchor="middle" fill="#a8a8a8" font-family="Arial, Helvetica, sans-serif" font-size="36" letter-spacing="2">>AB02:0 ?> >A:25 24/7</text>
+  <text x="600" y="450" text-anchor="middle" fill="#666" font-family="Arial, Helvetica, sans-serif" font-size="22">18+ � premium night delivery</text>
+</svg>

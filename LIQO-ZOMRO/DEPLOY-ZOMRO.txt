@@ -1,0 +1,51 @@
+LIQO.PRO — деплой на Zomro
+================================
+
+1. ФАЙЛЫ ДЛЯ ЗАГРУЗКИ
+   Загрузите ВСЁ содержимое этой папки (LIQO-ZOMRO) в корень сайта на Zomro
+   (обычно public_html или www для домена liqo.pro).
+
+2. ДИРЕКТОРИЯ
+   /public_html/  или  /www/liqo.pro/  — корень домена liqo.pro
+
+3. ДОМЕН
+   В панели Zomro привяжите домен liqo.pro к этой директории.
+   Основной адрес: https://liqo.pro/ (без www).
+
+4. SSL
+   В панели Zomro включите бесплатный Let's Encrypt для liqo.pro.
+   После выпуска сертификата .htaccess перенаправит HTTP → HTTPS.
+
+5. TELEGRAM
+   Обработчик: /api/order.php
+   Настройки: /config/telegram.json
+   Поля:
+     TELEGRAM_BOT_TOKEN — токен бота
+     TELEGRAM_CHAT_ID   — ID чата для заявок
+   Файл config/telegram.json защищён .htaccess — не доступен из браузера.
+   НИКОГДА не помещайте токен в HTML или JS.
+
+6. ПРАВА
+   Файлы: 644
+   Папки: 755
+   config/telegram.json: 600 (рекомендуется)
+
+7. ТЕСТ ЗАКАЗА
+   a) Откройте https://liqo.pro/catalog.html
+   b) Добавьте товар в корзину
+   c) Оформите заказ (имя + телефон + адрес)
+   d) Проверьте сообщение в Telegram
+   e) GET https://liqo.pro/api/order.php — должен вернуть {"configured":true}
+
+8. .HTACCESS
+   Файл .htaccess в корне — проверьте, что mod_rewrite включён на хостинге.
+   Правила: HTTPS, liqo.pro без www, /api/telegram → order.php
+
+9. SITEMAP И ROBOTS
+   https://liqo.pro/sitemap.xml
+   https://liqo.pro/robots.txt
+
+10. ПРОБЛЕМЫ
+    — 500 на order.php: проверьте PHP 7.4+ и curl
+    — Заказ не уходит: проверьте config/telegram.json
+    — 404 на страницах: загрузите все папки raion/, metro/, kategoria/
