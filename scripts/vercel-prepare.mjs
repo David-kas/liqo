@@ -1,6 +1,7 @@
 /**
  * Vercel production preparation for the static LIQO site.
- * Normalizes the public origin in generated/static files and performs a final old-domain check.
+ * Normalizes the public origin in generated/static files, repairs the known homepage JSON-LD issue,
+ * adds phone metadata to selected pages, and performs a final old-domain check.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,6 +37,21 @@ function normalizeDomains(text) {
   return out;
 }
 
+function repairHomepageSchema(html) {
+  // The source homepage had a missing closing brace after hasOfferCatalog,
+  // which made the whole JSON-LD block invalid. Repair only that exact shape.
+  const marker = '"hasOfferCatalog": {';
+  const orgMarker = '\n            {\n            "@type": "Organization"';
+  const start = html.indexOf(marker);
+  if (start === -1) return html;
+  const org = html.indexOf(orgMarker, start);
+  if (org === -1) return html;
+  const segment = html.slice(start, org);
+  if (!segment.includes('"@type": "OfferCatalog"')) return html;
+  if (segment.trimEnd().endsWith('},')) return html;
+  return html.slice(0, org) + '\n        } ,' + html.slice(org);
+}
+
 function addPhoneSeo(html) {
   let out = html;
   out = out.replace(/<title>([\s\S]*?)<\/title>/i, (_, value) => {
@@ -63,6 +79,7 @@ for (const file of walk(ROOT)) {
   const before = fs.readFileSync(file, 'utf8');
   let after = normalizeDomains(before);
   const rel = path.relative(ROOT, file).replaceAll(path.sep, '/');
+  if (rel === 'index.html') after = repairHomepageSchema(after);
   if (selected.has(rel) && /<html\b/i.test(after)) after = addPhoneSeo(after);
   if (after !== before) {
     fs.writeFileSync(file, after, 'utf8');
@@ -76,6 +93,23 @@ fs.writeFileSync(
   'utf8',
 );
 
+// Validate JSON-LD blocks after the repair. Do not silently publish broken structured data.
+let invalidJsonLd = 0;
+for (const file of walk(ROOT).filter((f) => f.endsWith('.html'))) {
+  const html = fs.readFileSync(file, 'utf8');
+  const re = /<script type=["']application\/ld\+json["']>\s*([\s\S]*?)\s*<\/script>/gi;
+  let match;
+  while ((match = re.exec(html)) !== null) {
+    try {
+      JSON.parse(match[1]);
+    } catch {
+      invalidJsonLd++;
+      console.error(`Invalid JSON-LD: ${path.relative(ROOT, file)}`);
+    }
+  }
+}
+if (invalidJsonLd) throw new Error(`JSON-LD validation failed: ${invalidJsonLd} invalid block(s)`);
+
 for (const file of walk(ROOT)) {
   const text = fs.readFileSync(file, 'utf8');
   if (/liqo\.pro|alkodostavka24\.vercel\.app|alkodastavka\.vercel\.app|dostavka-alkogolya-24\.vercel\.app|alkodostavka24\.online/i.test(text)) {
@@ -83,4 +117,4 @@ for (const file of walk(ROOT)) {
   }
 }
 
-console.log(`LIQO Vercel preparation: ${changed} text files normalized; old-domain check passed.`);
+console.log(`LIQO Vercel preparation: ${changed} text files normalized; JSON-LD valid; old-domain check passed.`);
