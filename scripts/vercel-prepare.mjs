@@ -7,13 +7,17 @@ const NEW_ORIGIN = 'https://liqo24.vercel.app';
 const PHONE = '+7 (925) 121-99-72';
 const TEXT_EXT = /\.(html|xml|txt|json|webmanifest|js|mjs|css|md)$/i;
 const SKIP = new Set(['.git', 'node_modules', '.github', 'LIQO-ZOMRO', '_import-images']);
-const OLD_DOMAINS = [
-  /https?:\/\/(?:www\.)?liqo\.pro/gi,
-  /https?:\/\/(?:www\.)?alkodostavka24\.vercel\.app/gi,
-  /https?:\/\/(?:www\.)?alkodastavka\.vercel\.app/gi,
-  /https?:\/\/(?:www\.)?dostavka-alkogolya-24\.vercel\.app/gi,
-  /https?:\/\/(?:www\.)?alkodostavka24\.online/gi,
+const LEGACY_HOSTS = [
+  'liqo.pro',
+  'alkodostavka24.vercel.app',
+  'alkodastavka.vercel.app',
+  'dostavka-alkogolya-24.vercel.app',
+  'alkodostavka24.online',
 ];
+
+function hostRegex(host) {
+  return new RegExp(`(?<![A-Za-z0-9.-])${host.replaceAll('.', '\\.')}(?![A-Za-z0-9.-])`, 'gi');
+}
 
 function walk(dir, out = []) {
   for (const name of fs.readdirSync(dir)) {
@@ -28,20 +32,21 @@ function walk(dir, out = []) {
 
 function normalizeDomains(text) {
   let out = text;
-  for (const re of OLD_DOMAINS) out = out.replace(re, NEW_ORIGIN);
-  out = out.replace(/(?<!@)(?<![A-Za-z0-9.-])liqo\.pro\b/gi, 'liqo24.vercel.app');
+  for (const host of LEGACY_HOSTS) {
+    out = out.replace(new RegExp(`https?:\\/\\/(?:www\\.)?${host.replaceAll('.', '\\.')}`, 'gi'), NEW_ORIGIN);
+    out = out.replace(hostRegex(host), 'liqo24.vercel.app');
+  }
   return out;
 }
 
 function repairHomepageSchema(html) {
-  // The source homepage contains one missing closing brace between OfferCatalog
-  // and the following Organization object. Repair that exact structural boundary.
   const marker = '"hasOfferCatalog": {';
   const start = html.indexOf(marker);
   if (start === -1) return html;
   const org = html.indexOf('"@type": "Organization"', start);
   if (org === -1) return html;
   const between = html.slice(start, org);
+  // Repair only the known missing LocalBusiness closing brace. Idempotent on repeat builds.
   if (/}\s*,\s*{\s*$/.test(between)) {
     const fixedBetween = between.replace(/}\s*,\s*{\s*$/, '}\n            },\n            {\n            ');
     return html.slice(0, start) + fixedBetween + html.slice(org);
@@ -65,6 +70,31 @@ function addPhoneSeo(html) {
   return out;
 }
 
+function routeFromHtml(file) {
+  const rel = path.relative(ROOT, file).replaceAll(path.sep, '/');
+  if (rel === 'index.html') return '/';
+  if (!rel.endsWith('.html')) return null;
+  if (rel === '404.html' || rel.startsWith('admin/')) return null;
+  return '/' + rel.slice(0, -5);
+}
+
+function generateSitemap() {
+  const pages = walk(ROOT)
+    .filter((file) => /\.html$/i.test(file))
+    .map(routeFromHtml)
+    .filter(Boolean)
+    .filter((route, index, all) => all.indexOf(route) === index)
+    .sort((a, b) => a.localeCompare(b));
+
+  const urls = pages.map((route) => {
+    const priority = route === '/' ? '1.0' : route === '/catalog' ? '0.9' : '0.7';
+    const changefreq = route === '/' || route === '/catalog' ? 'weekly' : 'monthly';
+    return `  <url>\n    <loc>${NEW_ORIGIN}${route}</loc>\n    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+  }).join('\n');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
 const selected = new Set([
   'index.html', 'catalog.html', 'contacts.html', 'faq.html',
   'dostavka-nochyu-moskva.html', 'dostavka-butovo.html',
@@ -84,21 +114,14 @@ for (const file of walk(ROOT)) {
   }
 }
 
-// Write the actual production sitemap and robots with the new Vercel origin.
-const sitemapPath = path.join(ROOT, 'sitemap.xml');
-if (fs.existsSync(sitemapPath)) {
-  const sitemap = fs.readFileSync(sitemapPath, 'utf8')
-    .replace(/https?:\/\/(?:www\.)?liqo\.pro/gi, NEW_ORIGIN);
-  fs.writeFileSync(sitemapPath, sitemap, 'utf8');
-}
+// Build a fresh sitemap from the actual public HTML pages, so it cannot retain stale domains.
+fs.writeFileSync(path.join(ROOT, 'sitemap.xml'), generateSitemap(), 'utf8');
 fs.writeFileSync(
   path.join(ROOT, 'robots.txt'),
-  `User-agent: *\nAllow: /\n\nSitemap: ${NEW_ORIGIN}/sitemap.xml\n`,
+  `User-agent: *\nAllow: /\n\nSitemap: ${NEW_ORIGIN}/sitemap.xml\nHost: ${NEW_ORIGIN}\n`,
   'utf8',
 );
 
-// Validate JSON-LD, but do not make deployment unavailable because of legacy
-// markup outside the repaired homepage block. Log every remaining issue.
 let invalidJsonLd = 0;
 for (const file of walk(ROOT).filter((f) => f.endsWith('.html'))) {
   const html = fs.readFileSync(file, 'utf8');
@@ -115,9 +138,8 @@ for (const file of walk(ROOT).filter((f) => f.endsWith('.html'))) {
 
 for (const file of walk(ROOT)) {
   const text = fs.readFileSync(file, 'utf8');
-  if (/liqo\.pro|alkodostavka24\.vercel\.app|alkodastavka\.vercel\.app|dostavka-alkogolya-24\.vercel\.app|alkodostavka24\.online/i.test(text)) {
-    throw new Error(`Old domain remains after normalization in ${path.relative(ROOT, file)}`);
-  }
+  const legacy = LEGACY_HOSTS.some((host) => hostRegex(host).test(text));
+  if (legacy) throw new Error(`Old domain remains after normalization in ${path.relative(ROOT, file)}`);
 }
 
-console.log(`LIQO Vercel preparation complete: ${changed} files normalized; sitemap and robots updated; JSON-LD warnings: ${invalidJsonLd}.`);
+console.log(`LIQO Vercel preparation complete: ${changed} files normalized; sitemap generated for ${generateSitemap().match(/<loc>/g)?.length || 0} pages; JSON-LD warnings: ${invalidJsonLd}.`);
