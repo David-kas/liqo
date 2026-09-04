@@ -40,17 +40,107 @@ function normalizeDomains(text) {
 }
 
 function repairHomepageSchema(html) {
-  const marker = '"hasOfferCatalog": {';
-  const start = html.indexOf(marker);
-  if (start === -1) return html;
-  const org = html.indexOf('"@type": "Organization"', start);
-  if (org === -1) return html;
-  const between = html.slice(start, org);
-  if (/}\s*,\s*{\s*$/.test(between)) {
-    const fixedBetween = between.replace(/}\s*,\s*{\s*$/, '}\n            },\n            {\n            ');
-    return html.slice(0, start) + fixedBetween + html.slice(org);
-  }
-  return html;
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${NEW_ORIGIN}/#website`,
+        url: `${NEW_ORIGIN}/`,
+        name: 'LIQO',
+        inLanguage: 'ru-RU',
+        publisher: { '@id': `${NEW_ORIGIN}/#organization` },
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${NEW_ORIGIN}/#organization`,
+        name: 'LIQO',
+        url: `${NEW_ORIGIN}/`,
+        logo: `${NEW_ORIGIN}/favicon.svg`,
+        telephone: '+79251219972',
+        sameAs: ['https://t.me/alkotaxi_bot'],
+      },
+      {
+        '@type': 'LocalBusiness',
+        '@id': `${NEW_ORIGIN}/#business`,
+        name: 'LIQO',
+        url: `${NEW_ORIGIN}/`,
+        image: `${NEW_ORIGIN}/favicon.svg`,
+        telephone: '+79251219972',
+        priceRange: '₽₽',
+        description: 'Круглосуточная доставка алкоголя и закусок на дом по Москве и Московской области',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: 'Москва',
+          addressRegion: 'Москва',
+          addressCountry: 'RU',
+        },
+        areaServed: [
+          { '@type': 'City', name: 'Москва' },
+          { '@type': 'AdministrativeArea', name: 'Московская область' },
+        ],
+        openingHoursSpecification: [{
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+          opens: '00:00',
+          closes: '23:59',
+        }],
+        hasOfferCatalog: {
+          '@type': 'OfferCatalog',
+          name: 'Каталог алкоголя',
+          url: `${NEW_ORIGIN}/catalog.html`,
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: [
+          {
+            '@type': 'Question',
+            name: 'Как заказать доставку алкоголя на дом?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Напишите в WhatsApp или Telegram, либо оставьте заявку на странице Контакты. Мы принимаем заказы круглосуточно.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Работаете ли вы круглосуточно?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Да, приём заказов и доставка по согласованию доступны 24/7, включая ночные часы и выходные.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Доставляете ли алкоголь ночью?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Да, ночная доставка по Москве и области возможна. Точное время зависит от района и загрузки — уточняйте у оператора.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Какая минимальная сумма заказа?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Минимальная сумма заказа от 1000 ₽. Условия акций и бесплатной доставки уточняйте при оформлении.',
+            },
+          },
+          {
+            '@type': 'Question',
+            name: 'Как быстро привезут заказ?',
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: 'Во многих заказах по Москве укладываемся в 20–40 минут после подтверждения; в часы пик, ночью или при плохой погоде срок может быть ближе к часу. Менеджер назовёт реалистичное окно.',
+            },
+          },
+        ],
+      },
+    ],
+  };
+
+  const block = `<script type="application/ld+json">\n${JSON.stringify(schema, null, 2)}\n</script>`;
+  return html.replace(/<script type=["']application\/ld\+json["']>[\s\S]*?<\/script>/i, block);
 }
 
 function addPhoneSeo(html) {
