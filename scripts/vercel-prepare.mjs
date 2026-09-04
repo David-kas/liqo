@@ -38,15 +38,12 @@ function normalizeDomains(text) {
 }
 
 function repairHomepageSchema(html) {
-  const marker = '"hasOfferCatalog": {';
-  const orgMarker = '\n            {\n            "@type": "Organization"';
-  const start = html.indexOf(marker);
-  if (start === -1) return html;
-  const org = html.indexOf(orgMarker, start);
-  if (org === -1) return html;
-  const segment = html.slice(start, org);
-  if (!segment.includes('"@type": "OfferCatalog"')) return html;
-  return html.slice(0, org) + '\n        } ,' + html.slice(org);
+  const malformedBoundary = /(\n\s*"hasOfferCatalog"\s*:\s*\{[\s\S]*?\n\s*\}),\n\s*(\{\n\s*"@type"\s*:\s*"Organization")/;
+  if (!malformedBoundary.test(html)) return html;
+  return html.replace(
+    malformedBoundary,
+    '$1\n        },\n        $2',
+  );
 }
 
 function addPhoneSeo(html) {
