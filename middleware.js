@@ -27,11 +27,11 @@ export default function middleware(request) {
 
   const isBot = botPattern.test(userAgent);
 
-  // ВАЖНО: ограничение доступа с ПК сохраняется.
+  // Для обычного доступа с ПК возвращаем стандартную страницу 404.
   if (!isMobile && !isBot) {
     return new Response(
-      '<html><body><h1>Доступ с ПК ограничен</h1><p>Сайт открыт только для мобильных устройств.</p></body></html>',
-      { status: 403, headers: { 'content-type': 'text/html; charset=utf-8' } }
+      '<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Ошибка 404</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><h1>Ошибка 404</h1><p>Страница не существует.</p></body></html>',
+      { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } }
     );
   }
 
