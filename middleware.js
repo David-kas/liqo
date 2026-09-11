@@ -1,39 +1,31 @@
+import { next } from '@vercel/functions';
+
+// Не используем fetch(request): на Vercel это повторно запускает Routing Middleware.
+// Для продолжения запроса используем официальный helper next().
+export const config = {
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|apple-touch-icon|site.webmanifest|.*\\.(?:css|js|mjs|json|xml|txt|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|map)$).*)'],
+};
+
+const BOT_PATTERN = /Googlebot|Google-InspectionTool|Googlebot-Image|Googlebot-Video|AdsBot-Google|Mediapartners-Google|GoogleOther|YandexBot|YandexMobileBot|YandexVideo|YandexImages|YandexAccessibilityBot|YandexDirect|YandexBlogs|YandexMirrorDetector|YandexMedia|YandexWebmaster|YandexCalendar|YandexNews|YandexTurbo|Bingbot|Baiduspider|DuckDuckBot|Slurp|FacebookBot|Twitterbot|Applebot|AhrefsBot|SemrushBot|MJ12bot|DotBot|Yeti|NaverBot|Yahoo!\sSlurp|ia_archiver|rogerbot|exabot|spider|crawler|scanner|checker|validator|bot/i;
+const MOBILE_PATTERN = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i;
+
 export default function middleware(request) {
-  const url = new URL(request.url);
   const userAgent = request.headers.get('user-agent') || '';
+  const isBot = BOT_PATTERN.test(userAgent);
+  const isMobile = MOBILE_PATTERN.test(userAgent);
 
-  // Пропускаем статику и API без проверки
-  const staticPathPattern = /^\/(favicon|apple-touch-icon|site\.webmanifest|favicon-.*\.png)/i;
-  if (staticPathPattern.test(url.pathname)) return fetch(request);
-  if (url.pathname.startsWith('/api/')) return fetch(request);
+  // Роботы и мобильные пользователи получают настоящий сайт.
+  if (isBot || isMobile) return next();
 
-  // Определяем мобильное устройство
-  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(userAgent);
-
-  // Поисковые роботы и сервисы проверки должны получать страницы для индексации.
-  const botPattern = new RegExp(
-    'Googlebot|Google-InspectionTool|Googlebot-Image|Googlebot-Video|' +
-    'AdsBot-Google|Mediapartners-Google|GoogleOther|' +
-    'YandexBot|YandexMobileBot|YandexVideo|YandexImages|' +
-    'YandexAccessibilityBot|YandexDirect|YandexBlogs|YandexMirrorDetector|' +
-    'YandexMedia|YandexWebmaster|YandexCalendar|YandexNews|YandexTurbo|' +
-    'Bingbot|Baiduspider|DuckDuckBot|Slurp|' +
-    'FacebookBot|Twitterbot|Applebot|' +
-    'AhrefsBot|SemrushBot|MJ12bot|DotBot|Yeti|NaverBot|' +
-    'Yahoo!\\ Slurp|ia_archiver|rogerbot|exabot|' +
-    'spider|crawler|scanner|checker|validator|bot',
-    'i'
+  // Обычный доступ с ПК блокируем. Никаких redirect/fetch-loop.
+  return new Response(
+    '<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ошибка 404</title></head><body><h1>Ошибка 404</h1><p>Страница не существует.</p></body></html>',
+    {
+      status: 404,
+      headers: {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'no-store, no-cache, must-revalidate',
+      },
+    },
   );
-
-  const isBot = botPattern.test(userAgent);
-
-  // Для обычного доступа с ПК возвращаем стандартную страницу 404.
-  if (!isMobile && !isBot) {
-    return new Response(
-      '<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Ошибка 404</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><h1>Ошибка 404</h1><p>Страница не существует.</p></body></html>',
-      { status: 404, headers: { 'content-type': 'text/html; charset=utf-8' } }
-    );
-  }
-
-  return fetch(request);
 }
