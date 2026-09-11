@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://liqo.pro/sitemap.xml
-Host: https://liqo.pro
+Sitemap: https://liqo24.vercel.app/sitemap.xml
+Host: https://liqo24.vercel.app
