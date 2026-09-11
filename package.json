@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/migrate-liqo.mjs && node scripts/vercel-prepare.mjs && node scripts/prepare-vercel-static.mjs && node scripts/fix-home-heading.mjs",
+    "build": "node scripts/migrate-liqo.mjs && node scripts/fix-home-heading.mjs && node scripts/sync-root-category-pages.mjs && node scripts/vercel-prepare.mjs && node scripts/prepare-vercel-static.mjs",
     "generate:seo": "node scripts/generate-seo-pages.mjs",
     "fix:seo": "node scripts/fix-site-seo.mjs",
     "patch:cart": "node scripts/patch-header-cart.mjs",
@@ -21,7 +21,7 @@
     "export:catalog": "node scripts/export-catalog-json.mjs",
     "catalog:render": "node scripts/render-catalog-html.mjs",
     "seed:blob": "node scripts/seed-blob-catalog.mjs",
-    "perf": "npm run build:assets && npm run patch:perf",
+    "perf": "npm run build:assets && node scripts/patch-performance.mjs",
     "migrate:liqo": "node scripts/migrate-liqo.mjs",
     "liqo:all": "node scripts/migrate-liqo.mjs && node scripts/build-assets.mjs"
   },
