@@ -3,12 +3,12 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const NEW_ORIGIN = 'https://liqo.pro';
-const PHONE = '+7 (999) 786-39-67';
-const PHONE_TEL = '+79997863967';
+const PHONE = '+7 (925) 121-99-72';
+const PHONE_TEL = '+79251219972';
 const TEXT_EXT = /\.(html|xml|txt|json|webmanifest|js|mjs|css|md)$/i;
 const SKIP = new Set(['.git', 'node_modules', '.github', 'LIQO-ZOMRO', '_import-images']);
 const LEGACY_HOSTS = ['liqo24.vercel.app','alkodostavka24.vercel.app','alkodastavka.vercel.app','dostavka-alkogolya-24.vercel.app','alkodostavka24.online','dostavka-alkogolya.pro'];
-const LEGACY_PHONE_RE = /\+7\s*\(925\)\s*121[-–]?99[-–]?72|\+79251219972/g;
+const LEGACY_PHONE_RE = /\+7\s*\(999\)\s*786[-–]?39[-–]?67|\+79997863967/g;
 const OBSOLETE = new Set(['city-kazan.html','city-moskva.html','dostavka.html','landing-viski.html','landing-vodka.html','landing-pivo.html']);
 function walk(dir, out = []) { for (const name of fs.readdirSync(dir)) { if (SKIP.has(name)) continue; const file = path.join(dir,name), stat = fs.statSync(file); if (stat.isDirectory()) walk(file,out); else if (TEXT_EXT.test(name) && stat.size <= 2500000) out.push(file); } return out; }
 function normalizeDomains(text) { let out=text; for (const host of LEGACY_HOSTS) { out=out.replace(new RegExp(`https?:\\/\\/(?:www\\.)?${host.replaceAll('.', '\\.')}`,'gi'),NEW_ORIGIN); out=out.replace(new RegExp(`(?<![A-Za-z0-9.-])${host.replaceAll('.', '\\.')}(?![A-Za-z0-9.-])`,'gi'),'liqo.pro'); } return out; }
