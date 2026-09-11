@@ -82,12 +82,16 @@ function fixBrandInMeta(c) {
 function fixTitleSuffix(c) {
   let out = c;
   out = out.replace(
+    /<title>Доставка алкоголя в Москве 24\/7 на дом — LIQO<\/title>/,
+    '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>',
+  );
+  out = out.replace(
     /<title>Доставка алкоголя в Москве на дом 24\/7 — заказать с доставкой \| АЛКОдоставка 18\+<\/title>/,
-    '<title>Доставка алкоголя в Москве 24/7 на дом — LIQO</title>',
+    '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>',
   );
   out = out.replace(
     /<meta name="description" content="Заказать алкоголь с доставкой на дом в Москве и МО\.[^"]*">/,
-    '<meta name="description" content="LIQO — доставка алкоголя и закусок на дом в Москве и МО 24/7. Водка, виски, вино, пиво. Часто 20–60 мин. Заказ от 1000 ₽. 18+.">',
+    '<meta name="description" content="LIQO — круглосуточная доставка алкоголя Москва и МО. Водка, виски, вино, пиво и закуски с доставкой на дом 24/7. Заказ от 1000 ₽. 18+.">',
   );
   out = out.replace(/\| АЛКОдоставка 18\+/g, '— LIQO');
   out = out.replace(/\| АЛКОдоставка/g, '— LIQO');
@@ -97,12 +101,12 @@ function fixTitleSuffix(c) {
     '<meta property="og:image" content="https://liqo.pro/images/og-liqo.svg">',
   );
   out = out.replace(
-    /<meta property="og:title" content="[^"]*АЛКОдоставка[^"]*">/,
-    '<meta property="og:title" content="Доставка алкоголя в Москве 24/7 — LIQO">',
+    /<meta property="og:title" content="[^"]*">/,
+    '<meta property="og:title" content="Круглосуточная доставка алкоголя Москва — LIQO">',
   );
   out = out.replace(
-    /<meta name="twitter:title" content="[^"]*АЛКОдоставка[^"]*">/,
-    '<meta name="twitter:title" content="LIQO — доставка алкоголя 24/7 по Москве">',
+    /<meta name="twitter:title" content="[^"]*">/,
+    '<meta name="twitter:title" content="LIQO — круглосуточная доставка алкоголя Москва">',
   );
   return out;
 }
@@ -154,13 +158,13 @@ function replaceSticky(html) {
 
 function fixIndexHero(html) {
   if (!html.includes('class="hero"')) return html;
-  const heroRe = /<section class="hero[^"]*">[\s\S]*?<\/section>/;
+  const heroRe = /<section class="hero[^\"]*">[\s\S]*?<\/section>/;
   const newHero = `<section class="hero hero-liqo">
             <div class="container hero-liqo-grid">
                 <div class="hero-liqo-copy">
                     <p class="hero-brand">LIQO</p>
-                    <h1>Доставка алкоголя в Москве на дом 24/7</h1>
-                    <p class="hero-subtitle">Крепкие напитки, вино, пиво и закуски. Доставка по Москве и Московской области.</p>
+                    <h1>Круглосуточная доставка алкоголя Москва</h1>
+                    <p class="hero-subtitle">Круглосуточная доставка алкоголя по Москве и Московской области. Водка, виски, вино, пиво и закуски — оформляйте заказ на дом в любое время суток.</p>
                     <p class="hero-trust-pills"><span>20–60 мин</span><span>24/7</span><span>Москва и МО</span><span>18+</span></p>
                     <div class="hero-buttons">
                         <a href="/catalog.html" class="btn btn-large">Смотреть каталог</a>
@@ -179,13 +183,26 @@ function fixIndexHero(html) {
 }
 
 function fixSeoBlockHeading(html) {
-  return html
+  let out = html
     .replace(
       /<h2>АЛКОдоставка — ваш надёжный партнёр/g,
-      '<h2 id="seo-info-heading">Полезная информация о доставке</h2>\n                <h3>LIQO — ваш надёжный партнёр',
+      '<h2 id="seo-info-heading">Круглосуточная доставка алкоголя Москва</h2>\n                <h3>LIQO — ваш надёжный партнёр',
     )
     .replace(/Компания АЛКОдоставка/g, 'Сервис LIQO')
     .replace(/в зону доставки АЛКОдоставка/g, 'в зону доставки LIQO');
+
+  if (!out.includes('class="seo-moscow-24-7"')) {
+    const marker = '<h3>LIQO — ваш надёжный партнёр';
+    const insert = `<div class="seo-moscow-24-7">
+                    <p><strong>Круглосуточная доставка алкоголя Москва</strong> — это возможность оформить заказ в удобное время, включая вечерние и ночные часы. LIQO принимает заявки 24/7 и организует доставку по районам Москвы и Московской области по согласованному адресу.</p>
+                    <p>Если вам нужна <strong>круглосуточная доставка алкоголя Москва</strong> с выбором напитков для дома, встречи или мероприятия, в каталоге можно подобрать водку, виски, коньяк, вино, игристое, пиво и закуски. Доставка алкоголя на дом доступна в разных районах столицы, а точное время зависит от адреса, дорожной ситуации и текущей загрузки курьеров.</p>
+                    <p>Заказать алкоголь можно через каталог или связаться с оператором. Для ночных заказов и срочной доставки менеджер уточнит наличие товара и ориентировочное время прибытия. Такой формат удобен, когда нужна <strong>круглосуточная доставка алкоголя Москва</strong> без поиска магазина, который работает до позднего вечера.</p>
+                    <p>LIQO делает акцент на удобном заказе и понятной доставке: выберите товары, укажите адрес и дождитесь подтверждения. Продажа и передача алкогольной продукции осуществляется только совершеннолетним.</p>
+                </div>
+                `;
+    if (out.includes(marker)) out = out.replace(marker, insert + marker);
+  }
+  return out;
 }
 
 function ensureCartPanel(html) {
