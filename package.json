@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/migrate-liqo.mjs && node scripts/vercel-prepare.mjs && node scripts/prepare-vercel-static.mjs",
+    "build": "node scripts/migrate-liqo.mjs && node scripts/vercel-prepare.mjs && node scripts/prepare-vercel-static.mjs && node scripts/fix-home-heading.mjs",
     "generate:seo": "node scripts/generate-seo-pages.mjs",
     "fix:seo": "node scripts/fix-site-seo.mjs",
     "patch:cart": "node scripts/patch-header-cart.mjs",
