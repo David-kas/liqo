@@ -29,5 +29,7 @@
     "clean-css": "^5.3.3",
     "terser": "^5.48.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@vercel/functions": "^3.0.0"
+  }
 }
