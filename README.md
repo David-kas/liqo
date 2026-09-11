@@ -1,6 +1,6 @@
 # LIQO — статический сайт + Vercel
 
-Сайт: **https://liqo24.vercel.app**
+Сайт: **https://liqo.pro**
 
 ## Деплой на Vercel (из GitHub)
 
@@ -9,15 +9,13 @@
 3. В **Environment Variables** добавьте:
    - `TELEGRAM_BOT_TOKEN` — токен бота
    - `TELEGRAM_CHAT_ID` — ID чата, куда приходят заявки
-4. Deploy. Основной домен проекта: `liqo24.vercel.app`.
+4. Deploy. Основной публичный домен проекта: `liqo.pro`.
 
 ## Форма заявки
 
 Формы с атрибутом `data-telegram-form` отправляют POST на `/api/telegram` (старые скрипты — на `/api/send-telegram`, тот же обработчик).
 
 **На Vercel обязательно** задайте переменные окружения `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`. Секреты не должны храниться в Git.
-
-Локально можно использовать `config/telegram.example.json` без публикации реального токена.
 
 Проверка API: `GET /api/telegram` → `ok/configured` должны отражать наличие переменных окружения.
 
@@ -36,4 +34,4 @@ npm run dev
 npm run generate:seo
 ```
 
-Перед публикацией `npm run build` автоматически нормализует публичный домен на `https://liqo24.vercel.app`, обновляет robots/sitemap и проверяет отсутствие старых доменов.
+Перед публикацией `npm run build` нормализует публичный домен на `https://liqo.pro`, заменяет старый телефон на актуальный, обновляет robots/sitemap и убирает старые legacy-домены из текстовых файлов.
