@@ -19,6 +19,8 @@ const OLD_DOMAINS = [
   /https?:\/\/dostavka-alkogolya-24\.vercel\.app/gi,
   /https?:\/\/alkodostavka24\.online/gi,
   /https?:\/\/www\.alkodostavka24\.online/gi,
+  /https?:\/\/liqo24\.vercel\.app/gi,
+  /liqo24\.vercel\.app/gi,
   /alkodostavka24\.vercel\.app/gi,
   /alkodastavka\.vercel\.app/gi,
   /alkodostavka24\.online/gi,
@@ -53,9 +55,7 @@ function detectActiveNav(rel) {
 
 function fixDomains(c) {
   let out = c;
-  for (const re of OLD_DOMAINS) {
-    out = out.replace(re, BASE);
-  }
+  for (const re of OLD_DOMAINS) out = out.replace(re, BASE);
   return out;
 }
 
@@ -66,10 +66,7 @@ function fixBrandInMeta(c) {
   out = out.replace(/"name": "АЛКОдоставка"/g, '"name": "LIQO"');
   out = out.replace(/info@alkovoz\.online/g, 'info@liqo.pro');
   out = out.replace(/mailto:info@alkovoz\.online/g, 'mailto:info@liqo.pro');
-  out = out.replace(
-    /Заказ%20%D0%90%D0%9B%D0%9A%D0%9E%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0/g,
-    encodeURIComponent('Заказ LIQO'),
-  );
+  out = out.replace(/Заказ%20%D0%90%D0%9B%D0%9A%D0%9E%D0%B4%D0%BE%D1%81%D1%82%D0%B0%D0%B2%D0%BA%D0%B0/g, encodeURIComponent('Заказ LIQO'));
   out = out.replace(/Заказ АЛКОдоставка/g, 'Заказ LIQO');
   out = out.replace(/Сайт АЛКОдоставка/g, 'Сайт LIQO');
   out = out.replace(/зону доставки АЛКОдоставка/g, 'зону доставки LIQO');
@@ -81,47 +78,23 @@ function fixBrandInMeta(c) {
 
 function fixTitleSuffix(c) {
   let out = c;
-  out = out.replace(
-    /<title>Доставка алкоголя в Москве 24\/7 на дом — LIQO<\/title>/,
-    '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>',
-  );
-  out = out.replace(
-    /<title>Доставка алкоголя в Москве на дом 24\/7 — заказать с доставкой \| АЛКОдоставка 18\+<\/title>/,
-    '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>',
-  );
-  out = out.replace(
-    /<meta name="description" content="Заказать алкоголь с доставкой на дом в Москве и МО\.[^"]*">/,
-    '<meta name="description" content="LIQO — круглосуточная доставка алкоголя Москва и МО. Водка, виски, вино, пиво и закуски с доставкой на дом 24/7. Заказ от 1000 ₽. 18+.">',
-  );
+  out = out.replace(/<title>Доставка алкоголя в Москве 24\/7 на дом — LIQO<\/title>/, '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>');
+  out = out.replace(/<title>Доставка алкоголя в Москве на дом 24\/7 — заказать с доставкой \| АЛКОдоставка 18\+<\/title>/, '<title>Круглосуточная доставка алкоголя Москва — LIQO</title>');
+  out = out.replace(/<meta name="description" content="Заказать алкоголь с доставкой на дом в Москве и МО\.[^"]*">/, '<meta name="description" content="LIQO — круглосуточная доставка алкоголя Москва и МО. Водка, виски, вино, пиво и закуски с доставкой на дом 24/7. Заказ от 1000 ₽. 18+.">');
   out = out.replace(/\| АЛКОдоставка 18\+/g, '— LIQO');
   out = out.replace(/\| АЛКОдоставка/g, '— LIQO');
   out = out.replace(/ — АЛКОдоставка/g, ' — LIQO');
-  out = out.replace(
-    /<meta property="og:image" content="[^"]*">/,
-    '<meta property="og:image" content="https://liqo.pro/images/og-liqo.svg">',
-  );
-  out = out.replace(
-    /<meta property="og:title" content="[^"]*">/,
-    '<meta property="og:title" content="Круглосуточная доставка алкоголя Москва — LIQO">',
-  );
-  out = out.replace(
-    /<meta name="twitter:title" content="[^"]*">/,
-    '<meta name="twitter:title" content="LIQO — круглосуточная доставка алкоголя Москва">',
-  );
+  out = out.replace(/<meta property="og:image" content="[^"]*">/, '<meta property="og:image" content="https://liqo.pro/images/og-liqo.svg">');
+  out = out.replace(/<meta property="og:title" content="[^"]*">/, '<meta property="og:title" content="Круглосуточная доставка алкоголя Москва — LIQO">');
+  out = out.replace(/<meta name="twitter:title" content="[^"]*">/, '<meta name="twitter:title" content="LIQO — круглосуточная доставка алкоголя Москва">');
   return out;
 }
 
 function fixFaviconLinks(c) {
-  const faviconBlock = `<link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
-    <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
+  const faviconBlock = `<link rel="icon" href="/favicon.ico" sizes="any">\n    <link rel="icon" href="/favicon.svg" type="image/svg+xml">\n    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">\n    <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">\n    <link rel="apple-touch-icon" href="/apple-touch-icon.png">`;
   let out = c.replace(/<link rel="icon"[^>]*>\s*/g, '');
   out = out.replace(/<link rel="apple-touch-icon"[^>]*>\s*/g, '');
-  if (out.includes('name="viewport"')) {
-    out = out.replace(/(<meta name="viewport"[^>]*>)/, `$1\n    ${faviconBlock}`);
-  }
+  if (out.includes('name="viewport"')) out = out.replace(/(<meta name="viewport"[^>]*>)/, `$1\n    ${faviconBlock}`);
   return out;
 }
 
@@ -159,47 +132,15 @@ function replaceSticky(html) {
 function fixIndexHero(html) {
   if (!html.includes('class="hero"')) return html;
   const heroRe = /<section class="hero[^\"]*">[\s\S]*?<\/section>/;
-  const newHero = `<section class="hero hero-liqo">
-            <div class="container hero-liqo-grid">
-                <div class="hero-liqo-copy">
-                    <p class="hero-brand">LIQO</p>
-                    <h1>Круглосуточная доставка алкоголя Москва</h1>
-                    <p class="hero-subtitle">Круглосуточная доставка алкоголя по Москве и Московской области. Водка, виски, вино, пиво и закуски — оформляйте заказ на дом в любое время суток.</p>
-                    <p class="hero-trust-pills"><span>20–60 мин</span><span>24/7</span><span>Москва и МО</span><span>18+</span></p>
-                    <div class="hero-buttons">
-                        <a href="/catalog.html" class="btn btn-large">Смотреть каталог</a>
-                        <button type="button" class="btn btn-large btn-outline js-oneclick-open">Заказать в 1 клик</button>
-                    </div>
-                </div>
-                <div class="hero-liqo-visual" aria-hidden="true">
-                    <picture>
-                        <source media="(max-width: 768px)" srcset="/images/hero-whiskey-bg-mobile.webp" type="image/webp">
-                        <img src="/images/hero-whiskey-bg.webp" alt="" width="520" height="400" loading="eager" decoding="async" fetchpriority="high">
-                    </picture>
-                </div>
-            </div>
-        </section>`;
+  const newHero = `<section class="hero hero-liqo"><div class="container hero-liqo-grid"><div class="hero-liqo-copy"><p class="hero-brand">LIQO</p><h1>Круглосуточная доставка алкоголя Москва</h1><p class="hero-subtitle">Круглосуточная доставка алкоголя по Москве и Московской области. Водка, виски, вино, пиво и закуски — оформляйте заказ на дом в любое время суток.</p><p class="hero-trust-pills"><span>20–60 мин</span><span>24/7</span><span>Москва и МО</span><span>18+</span></p><div class="hero-buttons"><a href="/catalog.html" class="btn btn-large">Смотреть каталог</a><button type="button" class="btn btn-large btn-outline js-oneclick-open">Заказать в 1 клик</button></div></div><div class="hero-liqo-visual" aria-hidden="true"><picture><source media="(max-width: 768px)" srcset="/images/hero-whiskey-bg-mobile.webp" type="image/webp"><img src="/images/hero-whiskey-bg.webp" alt="" width="520" height="400" loading="eager" decoding="async" fetchpriority="high"></picture></div></div></section>`;
   return html.replace(heroRe, newHero);
 }
 
 function fixSeoBlockHeading(html) {
-  let out = html
-    .replace(
-      /<h2>АЛКОдоставка — ваш надёжный партнёр/g,
-      '<h2 id="seo-info-heading">Круглосуточная доставка алкоголя Москва</h2>\n                <h3>LIQO — ваш надёжный партнёр',
-    )
-    .replace(/Компания АЛКОдоставка/g, 'Сервис LIQO')
-    .replace(/в зону доставки АЛКОдоставка/g, 'в зону доставки LIQO');
-
+  let out = html.replace(/<h2>АЛКОдоставка — ваш надёжный партнёр/g, '<h2 id="seo-info-heading">Круглосуточная доставка алкоголя Москва</h2>\n                <h3>LIQO — ваш надёжный партнёр').replace(/Компания АЛКОдоставка/g, 'Сервис LIQO').replace(/в зону доставки АЛКОдоставка/g, 'в зону доставки LIQO');
   if (!out.includes('class="seo-moscow-24-7"')) {
     const marker = '<h3>LIQO — ваш надёжный партнёр';
-    const insert = `<div class="seo-moscow-24-7">
-                    <p><strong>Круглосуточная доставка алкоголя Москва</strong> — это возможность оформить заказ в удобное время, включая вечерние и ночные часы. LIQO принимает заявки 24/7 и организует доставку по районам Москвы и Московской области по согласованному адресу.</p>
-                    <p>Если вам нужна <strong>круглосуточная доставка алкоголя Москва</strong> с выбором напитков для дома, встречи или мероприятия, в каталоге можно подобрать водку, виски, коньяк, вино, игристое, пиво и закуски. Доставка алкоголя на дом доступна в разных районах столицы, а точное время зависит от адреса, дорожной ситуации и текущей загрузки курьеров.</p>
-                    <p>Заказать алкоголь можно через каталог или связаться с оператором. Для ночных заказов и срочной доставки менеджер уточнит наличие товара и ориентировочное время прибытия. Такой формат удобен, когда нужна <strong>круглосуточная доставка алкоголя Москва</strong> без поиска магазина, который работает до позднего вечера.</p>
-                    <p>LIQO делает акцент на удобном заказе и понятной доставке: выберите товары, укажите адрес и дождитесь подтверждения. Продажа и передача алкогольной продукции осуществляется только совершеннолетним.</p>
-                </div>
-                `;
+    const insert = `<div class="seo-moscow-24-7"><p><strong>Круглосуточная доставка алкоголя Москва</strong> — это возможность оформить заказ в удобное время, включая вечерние и ночные часы. LIQO принимает заявки 24/7 и организует доставку по районам Москвы и Московской области по согласованному адресу.</p><p>Если вам нужна <strong>круглосуточная доставка алкоголя Москва</strong> с выбором напитков для дома, встречи или мероприятия, в каталоге можно подобрать водку, виски, коньяк, вино, игристое, пиво и закуски. Доставка алкоголя на дом доступна в разных районах столицы, а точное время зависит от адреса, дорожной ситуации и текущей загрузки курьеров.</p><p>Заказать алкоголь можно через каталог или связаться с оператором. Для ночных заказов и срочной доставки менеджер уточнит наличие товара и ориентировочное время прибытия. Такой формат удобен, когда нужна <strong>круглосуточная доставка алкоголя Москва</strong> без поиска магазина, который работает до позднего вечера.</p><p>LIQO делает акцент на удобном заказе и понятной доставке: выберите товары, укажите адрес и дождитесь подтверждения. Продажа и передача алкогольной продукции осуществляется только совершеннолетним.</p></div>`;
     if (out.includes(marker)) out = out.replace(marker, insert + marker);
   }
   return out;
@@ -215,13 +156,11 @@ function ensureCartPanel(html) {
 
 let changed = 0;
 const htmlFiles = walk(ROOT).filter((f) => f.endsWith('.html'));
-
 for (const fp of htmlFiles) {
   const rel = path.relative(ROOT, fp);
   let html = fs.readFileSync(fp, 'utf8');
   const before = html;
   const active = detectActiveNav(rel);
-
   html = fixDomains(html);
   html = fixBrandInMeta(html);
   html = fixTitleSuffix(html);
@@ -231,24 +170,11 @@ for (const fp of htmlFiles) {
   html = ensureCartPanel(html);
   html = replaceFooter(html);
   html = replaceSticky(html);
-
-  if (rel === 'index.html') {
-    html = fixIndexHero(html);
-    html = fixSeoBlockHeading(html);
-  }
-
-  if (html !== before) {
-    fs.writeFileSync(fp, html, 'utf8');
-    changed++;
-  }
+  if (rel === 'index.html') { html = fixIndexHero(html); html = fixSeoBlockHeading(html); }
+  if (html !== before) { fs.writeFileSync(fp, html, 'utf8'); changed++; }
 }
 
-const robots = `User-agent: *
-Allow: /
-
-Sitemap: https://liqo.pro/sitemap.xml
-Host: https://liqo.pro
-`;
+const robots = `User-agent: *\nAllow: /\n\nSitemap: https://liqo.pro/sitemap.xml\nHost: liqo.pro\n`;
 fs.writeFileSync(path.join(ROOT, 'robots.txt'), robots, 'utf8');
 
 const sitemapPath = path.join(ROOT, 'sitemap.xml');
@@ -261,13 +187,7 @@ if (fs.existsSync(sitemapPath)) {
 const manifestPath = path.join(ROOT, 'site.webmanifest');
 if (fs.existsSync(manifestPath)) {
   let m = fs.readFileSync(manifestPath, 'utf8');
-  m = m
-    .replace(/"name": "АЛКОдоставка"/, '"name": "LIQO"')
-    .replace(/"short_name": "АЛКОдоставка"/, '"short_name": "LIQO"')
-    .replace(/#d32f2f/, '#0a0a0a')
-    .replace(/"background_color": "#ffffff"/, '"background_color": "#0a0a0a"')
-    .replace(/favicon-192x192/, 'web-app-manifest-192x192')
-    .replace(/favicon-512x512/, 'web-app-manifest-512x512');
+  m = m.replace(/"name": "АЛКОдоставка"/, '"name": "LIQO"').replace(/"short_name": "АЛКОдоставка"/, '"short_name": "LIQO"').replace(/#d32f2f/, '#0a0a0a').replace(/"background_color": "#ffffff"/, '"background_color": "#0a0a0a"').replace(/favicon-192x192/, 'web-app-manifest-192x192').replace(/favicon-512x512/, 'web-app-manifest-512x512');
   fs.writeFileSync(manifestPath, m, 'utf8');
 }
 
