@@ -15,16 +15,16 @@ const existing = new RegExp(`${START}[\\s\\S]*?${END}`, 'g');
 html = html.replace(existing, '');
 
 html = html
-  .replace(/<title>[\\s\\S]*?<\\/title>/i, '<title>Доставка алкоголя Москва 24/7 — на дом круглосуточно | LIQO</title>')
+  .replace(/<title>[\s\S]*?<\/title>/i, '<title>Доставка алкоголя Москва 24/7 — на дом круглосуточно | LIQO</title>')
   .replace(/<meta name="description" content="[^"]*">/i, '<meta name="description" content="Доставка алкоголя в Москве и Московской области на дом 24/7. Круглосуточная и ночная доставка алкоголя: заказать или купить алкоголь с доставкой на дом. LIQO, 18+.">')
   .replace(/<meta property="og:title" content="[^"]*">/i, '<meta property="og:title" content="Доставка алкоголя Москва 24/7 — на дом круглосуточно | LIQO">')
   .replace(/<meta property="og:description" content="[^"]*">/i, '<meta property="og:description" content="Доставка алкоголя на дом в Москве и МО круглосуточно. Заказать алкоголь с доставкой 24/7, в том числе ночью. 18+.">')
   .replace(/<meta name="twitter:title" content="[^"]*">/i, '<meta name="twitter:title" content="Доставка алкоголя Москва 24/7 — LIQO">')
   .replace(/<meta name="twitter:description" content="[^"]*">/i, '<meta name="twitter:description" content="Круглосуточная доставка алкоголя на дом в Москве и Московской области, 24/7 и ночью. 18+.">')
-  .replace(/<h1>[^<]*<\\/h1>/i, '<h1>Доставка алкоголя в Москве на дом круглосуточно 24/7</h1>')
-  .replace(/<p class="hero-subtitle">[\\s\\S]*?<\\/p>/i, '<p class="hero-subtitle">Доставка алкоголя Москва 24/7: алкоголь на дом, ночью и круглосуточно по Москве и Московской области. Заказать алкоголь с доставкой можно через каталог или форму заказа.</p>')
-  .replace(/<h2 id="trust-heading">[\\s\\S]*?<\\/h2>/i, '<h2 id="trust-heading">Круглосуточная доставка алкоголя Москва 24/7</h2>')
-  .replace(/<section class="how-to-order"><div class="container"><h2>[\\s\\S]*?<\\/h2>/i, '<section class="how-to-order"><div class="container"><h2>Заказать алкоголь с доставкой на дом в Москве</h2>');
+  .replace(/<h1>[^<]*<\/h1>/i, '<h1>Доставка алкоголя в Москве на дом круглосуточно 24/7</h1>')
+  .replace(/<p class="hero-subtitle">[\s\S]*?<\/p>/i, '<p class="hero-subtitle">Доставка алкоголя Москва 24/7: алкоголь на дом, ночью и круглосуточно по Москве и Московской области. Заказать алкоголь с доставкой можно через каталог или форму заказа.</p>')
+  .replace(/<h2 id="trust-heading">[\s\S]*?<\/h2>/i, '<h2 id="trust-heading">Круглосуточная доставка алкоголя Москва 24/7</h2>')
+  .replace(/<section class="how-to-order"><div class="container"><h2>[\s\S]*?<\/h2>/i, '<section class="how-to-order"><div class="container"><h2>Заказать алкоголь с доставкой на дом в Москве</h2>');
 
 const block = `${START}
 <section class="seo-block wordstat-spam-experiment" aria-labelledby="wordstat-spam-heading">
